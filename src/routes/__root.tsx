@@ -53,10 +53,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "PickWise — Curated Amazon Finds" },
-      { name: "description", content: "Hand-picked Amazon products across electronics, home, fashion and more. Curated recommendations you can trust." },
-      { property: "og:title", content: "PickWise — Curated Amazon Finds" },
-      { property: "og:description", content: "Hand-picked Amazon products across electronics, home, fashion and more." },
+      { title: "PickWise — Shop Curated Products" },
+      { name: "description", content: "Discover a curated collection of quality products across electronics, home, fashion and more." },
+      { property: "og:title", content: "PickWise — Shop Curated Products" },
+      { property: "og:description", content: "A curated collection of quality products across categories." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -73,6 +73,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
+
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
