@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil, X } from "lucide-react";
+import { Plus, Trash2, Pencil, X, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
@@ -34,6 +34,8 @@ function AdminPage() {
   const [form, setForm] = useState<typeof emptyProduct>(emptyProduct);
   const [showForm, setShowForm] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -65,10 +67,57 @@ function AdminPage() {
       category_id: p.category_id ?? "",
       featured: p.featured,
     });
+    setImagePreview(p.image_url);
     setShowForm(true);
   };
 
-  const resetForm = () => { setEditing(null); setForm(emptyProduct); setShowForm(false); };
+  const resetForm = () => { setEditing(null); setForm(emptyProduct); setImagePreview(null); setShowForm(false); };
+
+  const handleImageUpload = async (file: File) => {
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please select an image file");
+        setUploading(false);
+        return;
+      }
+
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image must be less than 5MB");
+        setUploading(false);
+        return;
+      }
+
+      // Create unique filename
+      const filename = `${Date.now()}_${file.name}`;
+      const filepath = `product-images/${filename}`;
+
+      // Upload to Supabase Storage
+      const { data, error: uploadError } = await supabase.storage
+        .from("product_images")
+        .upload(filepath, file, { upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("product_images")
+        .getPublicUrl(filepath);
+
+      const publicUrl = urlData.publicUrl;
+      setForm({ ...form, image_url: publicUrl });
+      setImagePreview(publicUrl);
+      toast.success("Image uploaded successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,9 +226,38 @@ function AdminPage() {
                   onChange={(e) => setForm({ ...form, amazon_url: e.target.value })} className={input} />
               </Field>
 
-              <Field label="Image URL">
-                <input type="url" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} className={input} />
+              <Field label="Product Image">
+                <div className="space-y-2">
+                  {imagePreview && (
+                    <div className="relative w-full h-32 rounded-lg overflow-hidden bg-muted">
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => { setForm({ ...form, image_url: "" }); setImagePreview(null); }}
+                        className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                  <label className="flex items-center justify-center gap-2 rounded-md border-2 border-dashed border-input bg-muted/50 px-4 py-6 cursor-pointer hover:bg-muted transition">
+                    <Upload className="h-4 w-4" />
+                    <span className="text-sm text-muted-foreground">Click to upload image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageUpload(file);
+                      }}
+                      disabled={uploading}
+                      className="hidden"
+                    />
+                  </label>
+                  {uploading && <p className="text-xs text-muted-foreground">Uploading...</p>}
+                </div>
               </Field>
+
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Price">
                   <input placeholder="$29.99" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className={input} />
