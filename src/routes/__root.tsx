@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
@@ -53,10 +53,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "PickWise — Curated Amazon Finds" },
-      { name: "description", content: "Hand-picked Amazon products across electronics, home, fashion and more. Curated recommendations you can trust." },
-      { property: "og:title", content: "PickWise — Curated Amazon Finds" },
-      { property: "og:description", content: "Hand-picked Amazon products across electronics, home, fashion and more." },
+      { title: "PickWise — Shop Curated Products" },
+      { name: "description", content: "Discover a curated collection of quality products across electronics, home, fashion and more." },
+      { property: "og:title", content: "PickWise — Shop Curated Products" },
+      { property: "og:description", content: "A curated collection of quality products across categories." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -74,6 +74,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
@@ -87,7 +88,7 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function Header() {
-  const { user, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
@@ -98,23 +99,48 @@ function Header() {
         <nav className="flex items-center gap-3 text-sm">
           <Link to="/" className="text-muted-foreground hover:text-foreground [&.active]:text-foreground">Shop</Link>
           {isAdmin && (
-            <Link to="/admin" className="text-muted-foreground hover:text-foreground [&.active]:text-foreground">Admin</Link>
-          )}
-          {user ? (
-            <button
-              onClick={() => supabase.auth.signOut()}
-              className="rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
-            >
-              Sign out
-            </button>
-          ) : (
-            <Link to="/auth" className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">
-              Admin sign in
-            </Link>
+            <>
+              <Link to="/admin" className="text-muted-foreground hover:text-foreground [&.active]:text-foreground">Admin</Link>
+              <button
+                onClick={() => supabase.auth.signOut()}
+                className="rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
+              >
+                Sign out
+              </button>
+            </>
           )}
         </nav>
       </div>
     </header>
+  );
+}
+
+function DisclaimerModal() {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!sessionStorage.getItem("pw_notice_seen")) setOpen(true);
+  }, []);
+  if (!open) return null;
+  const dismiss = () => {
+    sessionStorage.setItem("pw_notice_seen", "1");
+    setOpen(false);
+  };
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
+        <h2 className="text-lg font-bold">Heads up before you browse</h2>
+        <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+          No transactions take place on this site. When you click <span className="font-semibold text-foreground">Buy Now</span>, you'll be taken to a trusted external store (such as Amazon) where your purchase is processed securely.
+        </p>
+        <button
+          onClick={dismiss}
+          className="mt-6 w-full rounded-md bg-primary py-2.5 text-sm font-semibold text-primary-foreground"
+        >
+          Got it
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -126,11 +152,12 @@ function RootComponent() {
         <Header />
         <Outlet />
         <footer className="mt-16 border-t border-border py-8 text-center text-xs text-muted-foreground">
-          <p>As an Amazon Associate we earn from qualifying purchases.</p>
-          <p className="mt-1">© {new Date().getFullYear()} PickWise</p>
+          <p>© {new Date().getFullYear()} PickWise. Purchases are completed on external retailer sites.</p>
         </footer>
       </div>
+      <DisclaimerModal />
       <Toaster position="top-center" />
     </QueryClientProvider>
   );
 }
+

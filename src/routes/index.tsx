@@ -56,14 +56,15 @@ function Home() {
       <section className="py-12 sm:py-16 text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
           <Sparkles className="h-3 w-3 text-accent" />
-          Hand-picked Amazon finds
+          Curated collection
         </div>
         <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl">
           Only the good stuff.
         </h1>
         <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-          Curated products across categories — click through to Amazon to buy.
+          Browse our hand-picked products across every category.
         </p>
+
 
         <div className="mt-8 mx-auto max-w-lg">
           <div className="relative">
@@ -105,9 +106,10 @@ function Home() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
           {products.length === 0
-            ? "No products yet. Sign in as admin to add your first pick."
+            ? "No products yet."
             : "No products match your search."}
         </div>
+
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-16">
           {filtered.map((p) => (
