@@ -106,9 +106,10 @@ function Home() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
           {products.length === 0
-            ? "No products yet. Sign in as admin to add your first pick."
+            ? "No products yet."
             : "No products match your search."}
         </div>
+
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-16">
           {filtered.map((p) => (
