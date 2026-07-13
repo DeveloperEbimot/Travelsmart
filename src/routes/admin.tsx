@@ -172,10 +172,11 @@ function AdminPage() {
               <Field label="Name *">
                 <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={input} />
               </Field>
-              <Field label="Amazon link *">
-                <input required type="url" placeholder="https://amazon.com/..." value={form.amazon_url}
+              <Field label="Buy link (your affiliate URL) *">
+                <input required type="url" placeholder="https://..." value={form.amazon_url}
                   onChange={(e) => setForm({ ...form, amazon_url: e.target.value })} className={input} />
               </Field>
+
               <Field label="Image URL">
                 <input type="url" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} className={input} />
               </Field>
