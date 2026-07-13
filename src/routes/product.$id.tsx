@@ -76,14 +76,15 @@ function ProductPage() {
           <a
             href={product.amazon_url}
             target="_blank"
-            rel="noopener noreferrer sponsored"
+            rel="noopener sponsored"
             className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 font-semibold text-accent-foreground transition hover:opacity-90"
           >
-            Buy on Amazon <ExternalLink className="h-4 w-4" />
+            Buy Now <ExternalLink className="h-4 w-4" />
           </a>
           <p className="mt-3 text-xs text-muted-foreground">
-            As an Amazon Associate we earn from qualifying purchases.
+            You'll be redirected to a trusted external retailer to complete your purchase securely.
           </p>
+
         </div>
       </div>
     </main>
