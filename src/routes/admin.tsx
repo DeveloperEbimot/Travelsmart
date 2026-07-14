@@ -384,8 +384,30 @@ function AdminPage() {
                 <textarea rows={4} value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })} className={input} />
               </Field>
+              <div className="grid grid-cols-3 gap-3">
+                <Field label="Rooms">
+                  <input type="number" min="0" value={form.rooms}
+                    onChange={(e) => setForm({ ...form, rooms: e.target.value })} className={input} />
+                </Field>
+                <Field label="Beds">
+                  <input type="number" min="0" value={form.beds}
+                    onChange={(e) => setForm({ ...form, beds: e.target.value })} className={input} />
+                </Field>
+                <Field label="Bathrooms">
+                  <input type="number" min="0" value={form.bathrooms}
+                    onChange={(e) => setForm({ ...form, bathrooms: e.target.value })} className={input} />
+                </Field>
+              </div>
+              <Field label="What's included (comma-separated)">
+                <input placeholder="Wifi, Breakfast, Pool, Washing machine" value={form.amenities}
+                  onChange={(e) => setForm({ ...form, amenities: e.target.value })} className={input} />
+              </Field>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={form.featured}
+                  onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
+                Featured
+              </label>
+
                   onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
                 Featured
               </label>
