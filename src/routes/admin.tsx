@@ -180,6 +180,11 @@ function AdminPage() {
     e.preventDefault();
     const mainImage = productImages.length > 0 ? productImages[0].image_url : form.image_url;
     
+    const amenitiesArr = form.amenities
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
     const payload = {
       name: form.name,
       description: form.description || null,
@@ -188,12 +193,19 @@ function AdminPage() {
       amazon_url: form.amazon_url,
       category_id: form.category_id || null,
       featured: form.featured,
+      listing_type: form.listing_type || null,
+      location: form.location || null,
+      beds: form.beds ? Number(form.beds) : null,
+      rooms: form.rooms ? Number(form.rooms) : null,
+      bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
+      amenities: amenitiesArr,
     };
     const { error } = editing
       ? await supabase.from("products").update(payload).eq("id", editing.id)
       : await supabase.from("products").insert(payload);
     if (error) return toast.error(error.message);
-    toast.success(editing ? "Product updated" : "Product added");
+    toast.success(editing ? "Listing updated" : "Listing added");
+
     resetForm();
     load();
   };
