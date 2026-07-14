@@ -408,14 +408,12 @@ function AdminPage() {
                 Featured
               </label>
 
-                  onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
-                Featured
-              </label>
+
             </div>
             <div className="mt-6 flex gap-2">
               <button type="button" onClick={resetForm} className="flex-1 rounded-md border border-border py-2 text-sm">Cancel</button>
               <button type="submit" className="flex-1 rounded-md bg-primary py-2 text-sm font-semibold text-primary-foreground">
-                {editing ? "Update" : "Add product"}
+                {editing ? "Update" : "Add listing"}
               </button>
             </div>
           </form>
