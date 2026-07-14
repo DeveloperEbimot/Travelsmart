@@ -292,10 +292,27 @@ function AdminPage() {
               <Field label="Name *">
                 <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={input} />
               </Field>
-              <Field label="Buy link (your affiliate URL) *">
-                <input required type="url" placeholder="https://..." value={form.amazon_url}
+              <Field label="Travelpayouts affiliate link *">
+                <input required type="url" placeholder="https://tp.media/..." value={form.amazon_url}
                   onChange={(e) => setForm({ ...form, amazon_url: e.target.value })} className={input} />
               </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Listing type">
+                  <select value={form.listing_type} onChange={(e) => setForm({ ...form, listing_type: e.target.value })} className={input}>
+                    <option value="hotel">Hotel</option>
+                    <option value="flight">Flight</option>
+                    <option value="tour">Tour</option>
+                    <option value="activity">Activity</option>
+                    <option value="car">Car rental</option>
+                    <option value="cruise">Cruise</option>
+                  </select>
+                </Field>
+                <Field label="Location">
+                  <input placeholder="Paris, France" value={form.location}
+                    onChange={(e) => setForm({ ...form, location: e.target.value })} className={input} />
+                </Field>
+              </div>
+
 
               {editing && (
                 <Field label="Product Images">
