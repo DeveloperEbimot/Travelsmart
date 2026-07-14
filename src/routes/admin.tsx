@@ -15,6 +15,12 @@ type Product = {
   amazon_url: string;
   category_id: string | null;
   featured: boolean;
+  listing_type: string | null;
+  location: string | null;
+  beds: number | null;
+  rooms: number | null;
+  bathrooms: number | null;
+  amenities: string[] | null;
 };
 
 type ProductImage = {
@@ -26,7 +32,9 @@ type ProductImage = {
 
 const emptyProduct = {
   name: "", description: "", image_url: "", price: "", amazon_url: "", category_id: "", featured: false,
+  listing_type: "hotel", location: "", beds: "", rooms: "", bathrooms: "", amenities: "",
 };
+
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -82,10 +90,17 @@ function AdminPage() {
       amazon_url: p.amazon_url,
       category_id: p.category_id ?? "",
       featured: p.featured,
+      listing_type: p.listing_type ?? "hotel",
+      location: p.location ?? "",
+      beds: p.beds != null ? String(p.beds) : "",
+      rooms: p.rooms != null ? String(p.rooms) : "",
+      bathrooms: p.bathrooms != null ? String(p.bathrooms) : "",
+      amenities: (p.amenities ?? []).join(", "),
     });
     loadProductImages(p.id);
     setShowForm(true);
   };
+
 
   const resetForm = () => { setEditing(null); setForm(emptyProduct); setProductImages([]); setShowForm(false); };
 
@@ -165,6 +180,11 @@ function AdminPage() {
     e.preventDefault();
     const mainImage = productImages.length > 0 ? productImages[0].image_url : form.image_url;
     
+    const amenitiesArr = form.amenities
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
     const payload = {
       name: form.name,
       description: form.description || null,
@@ -173,12 +193,19 @@ function AdminPage() {
       amazon_url: form.amazon_url,
       category_id: form.category_id || null,
       featured: form.featured,
+      listing_type: form.listing_type || null,
+      location: form.location || null,
+      beds: form.beds ? Number(form.beds) : null,
+      rooms: form.rooms ? Number(form.rooms) : null,
+      bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
+      amenities: amenitiesArr,
     };
     const { error } = editing
       ? await supabase.from("products").update(payload).eq("id", editing.id)
       : await supabase.from("products").insert(payload);
     if (error) return toast.error(error.message);
-    toast.success(editing ? "Product updated" : "Product added");
+    toast.success(editing ? "Listing updated" : "Listing added");
+
     resetForm();
     load();
   };
@@ -265,10 +292,27 @@ function AdminPage() {
               <Field label="Name *">
                 <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={input} />
               </Field>
-              <Field label="Buy link (your affiliate URL) *">
-                <input required type="url" placeholder="https://..." value={form.amazon_url}
+              <Field label="Travelpayouts affiliate link *">
+                <input required type="url" placeholder="https://tp.media/..." value={form.amazon_url}
                   onChange={(e) => setForm({ ...form, amazon_url: e.target.value })} className={input} />
               </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Listing type">
+                  <select value={form.listing_type} onChange={(e) => setForm({ ...form, listing_type: e.target.value })} className={input}>
+                    <option value="hotel">Hotel</option>
+                    <option value="flight">Flight</option>
+                    <option value="tour">Tour</option>
+                    <option value="activity">Activity</option>
+                    <option value="car">Car rental</option>
+                    <option value="cruise">Cruise</option>
+                  </select>
+                </Field>
+                <Field label="Location">
+                  <input placeholder="Paris, France" value={form.location}
+                    onChange={(e) => setForm({ ...form, location: e.target.value })} className={input} />
+                </Field>
+              </div>
+
 
               {editing && (
                 <Field label="Product Images">
@@ -340,16 +384,36 @@ function AdminPage() {
                 <textarea rows={4} value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })} className={input} />
               </Field>
+              <div className="grid grid-cols-3 gap-3">
+                <Field label="Rooms">
+                  <input type="number" min="0" value={form.rooms}
+                    onChange={(e) => setForm({ ...form, rooms: e.target.value })} className={input} />
+                </Field>
+                <Field label="Beds">
+                  <input type="number" min="0" value={form.beds}
+                    onChange={(e) => setForm({ ...form, beds: e.target.value })} className={input} />
+                </Field>
+                <Field label="Bathrooms">
+                  <input type="number" min="0" value={form.bathrooms}
+                    onChange={(e) => setForm({ ...form, bathrooms: e.target.value })} className={input} />
+                </Field>
+              </div>
+              <Field label="What's included (comma-separated)">
+                <input placeholder="Wifi, Breakfast, Pool, Washing machine" value={form.amenities}
+                  onChange={(e) => setForm({ ...form, amenities: e.target.value })} className={input} />
+              </Field>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={form.featured}
                   onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
                 Featured
               </label>
+
+
             </div>
             <div className="mt-6 flex gap-2">
               <button type="button" onClick={resetForm} className="flex-1 rounded-md border border-border py-2 text-sm">Cancel</button>
               <button type="submit" className="flex-1 rounded-md bg-primary py-2 text-sm font-semibold text-primary-foreground">
-                {editing ? "Update" : "Add product"}
+                {editing ? "Update" : "Add listing"}
               </button>
             </div>
           </form>
